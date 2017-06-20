@@ -1,0 +1,48 @@
+mysql:
+  image: mariadb
+  ports:
+      - "3306:3306"
+  environment:
+    MYSQL_DATABASE: project
+    MYSQL_USER: root
+    MYSQL_PASSWORD: root
+    MYSQL_ROOT_PASSWORD: root
+
+phpnginx:
+  image: ttaranto/docker-nginx-php7
+  links:
+    - mysql
+    - mailhog
+  ports:
+    - "82:80"
+  volumes:
+    - ./nginx:/etc/nginx/sites-enabled
+    - ./:/var/www
+    - ./log:/var/log/nginx
+
+phpmyadmin:
+  image: corbinu/docker-phpmyadmin
+  links:
+    - mysql
+  ports:
+    - 8181:80
+  environment:
+    MYSQL_USERNAME: root
+    MYSQL_ROOT_PASSWORD: root
+
+mailhog:
+  image: mailhog/mailhog
+  ports:
+    - 8026:8025
+    - 1026:1025
+
+wordpress:
+  image: wordpress
+  links:
+    - mysql
+  environment:
+    WORDPRESS_DB_USER: root
+    WORDPRESS_DB_NAME: root
+    WORDPRESS_DB_PASSWORD: root
+  volumes:
+    - ./wp:/var/www/wp
